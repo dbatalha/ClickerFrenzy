@@ -2,7 +2,7 @@ package com.example.templateapp;
 
 import android.widget.TextView;
 
-public class Statics {
+public class ClickActions {
 
     public static void increaseClicks(TextView editText, int count){
 
@@ -13,7 +13,7 @@ public class Statics {
 
     }
 
-    public static void decreaseClicks(TextView editText, int count){
+    public static int decreaseClicks(TextView editText, int count){
 
         int currentNumber = Integer.parseInt(editText.getText().toString());
 
@@ -22,6 +22,7 @@ public class Statics {
         }
         editText.setText(String.valueOf(currentNumber));
 
+        return currentNumber;
     }
 
 }

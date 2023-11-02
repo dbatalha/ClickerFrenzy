@@ -3,7 +3,7 @@ package com.example.templateapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.hardware.SensorManager;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -57,7 +60,12 @@ public class MainActivity extends AppCompatActivity {
                 playWarningEffect();
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 vibrate(50);
-                Statics.decreaseClicks(editText, 1);
+                int currentClicks = ClickActions.decreaseClicks(editText, 1);
+
+                // When the clicks is 0 stop click and vibration.
+                if (currentClicks == 0){
+                    this.timeEpoch = 0;
+                }
             }
 
             TimeUnit.SECONDS.sleep(1);
@@ -73,6 +81,17 @@ public class MainActivity extends AppCompatActivity {
 
         TextView editText = (TextView) findViewById(R.id.counterTextLabel);
         editText.setText("0");
+
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        try {
+            Quotes quotes = new Quotes();
+            quotes.getAllQuotes();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
         Thread timeThread = new Thread(new Runnable() {
             @Override
@@ -92,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 timeEpoch = System.currentTimeMillis();
                 Log.d("BUTTONS", "Button teste pressed.");
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
-                Statics.increaseClicks(editText, 1);
+                ClickActions.increaseClicks(editText, 1);
                 vibrate(100);
                 playSoundClick();
             }
@@ -104,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("BUTTONS", "Button long click teste pressed.");
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 vibrate(500);
-                Statics.increaseClicks(editText, 15);
+                ClickActions.increaseClicks(editText, 15);
                 return true;
             }
         });
