@@ -12,13 +12,34 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     private long timeEpoch = 0;
+
+    private static final String ERROR_API = "error calling quotes api";
+
+    private String url = "https://type.fit/api/quotes";
+
+    List<Quote> quotes;
+
+    public MainActivity() {
+
+    }
+
     public void playSoundClick() {
         Log.d("SOUND", "This is the function");
         MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.click_sound);
@@ -43,6 +64,59 @@ public class MainActivity extends AppCompatActivity {
         if (vibrator.hasVibrator()){
             vibrator.vibrate(time);
         }
+
+    }
+
+    private void setRandomQuote(){
+        int randomQuote = Helpers.getRandomNumber(0, quotes.size());
+
+        Quote selectedQuote = quotes.get(randomQuote);
+
+        TextView quoteText = (TextView) findViewById(R.id.quoteText);
+        TextView quoteAuthor = (TextView) findViewById(R.id.quoteAuthor);
+
+        quoteText.setText(selectedQuote.text);
+        quoteAuthor.setText(selectedQuote.author);
+    }
+
+    private void quotesRequest(){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+                public void onResponse(JSONArray response) {
+
+                String text;
+                String author;
+
+                quotes = new ArrayList<>();
+
+                for (int i=0 ; i < response.length() ; i++){
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        text = obj.getString("text");
+                        author = obj.getString("author");
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    Quote quote = new Quote();
+                    quote.author = author;
+                    quote.text = text;
+
+                    quotes.add(quote);
+                }
+
+                setRandomQuote();
+
+            }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("REST", ERROR_API);
+                }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonArrayRequest);
 
     }
 
@@ -84,14 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        try {
-            Quotes quotes = new Quotes();
-            quotes.getAllQuotes();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        this.quotesRequest();
 
         Thread timeThread = new Thread(new Runnable() {
             @Override
@@ -114,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 ClickActions.increaseClicks(editText, 1);
                 vibrate(100);
                 playSoundClick();
+                setRandomQuote();
             }
         });
         button.setOnLongClickListener(new View.OnLongClickListener() {
@@ -124,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 vibrate(500);
                 ClickActions.increaseClicks(editText, 15);
+                setRandomQuote();
                 return true;
             }
         });
