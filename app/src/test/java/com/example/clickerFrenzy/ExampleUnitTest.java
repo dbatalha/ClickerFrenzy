@@ -1,4 +1,4 @@
-package com.example.templateapp;
+package com.example.clickerFrenzy;
 
 import org.junit.Test;
 

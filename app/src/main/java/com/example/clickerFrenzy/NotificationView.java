@@ -1,4 +1,4 @@
-package com.example.templateapp;
+package com.example.clickerFrenzy;
 
 import android.os.Bundle;
 import android.widget.TextView;
@@ -12,8 +12,9 @@ public class NotificationView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_view);
         textView = findViewById(R.id.textView);
+
         //getting the notification message
-        String message=getIntent().getStringExtra("message");
+        String message = getIntent().getStringExtra("message");
         textView.setText(message);
     }
 }

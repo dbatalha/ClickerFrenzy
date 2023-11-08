@@ -1,4 +1,4 @@
-package com.example.templateapp;
+package com.example.clickerFrenzy;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TEST_CHANNEL = "test-channel";
     private static final int THRESHOLD = 1000;
+    private static final String COLOR_GOLD = "#DAA520";
     private long timeEpoch = 0;
     private static final String ERROR_API = "error calling quotes api";
     private String url = "https://type.fit/api/quotes";
@@ -153,10 +155,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = TEST_CHANNEL;
             String description = "This is a test channel";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(TEST_CHANNEL, name, importance);
+            NotificationChannel channel = new NotificationChannel(TEST_CHANNEL, TEST_CHANNEL, importance);
             channel.setDescription(description);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -193,10 +194,11 @@ public class MainActivity extends AppCompatActivity {
     private void rewards(TextView textView){
         int value = Integer.parseInt(textView.getText().toString());
 
-        if (value >= ( notificationStatus + THRESHOLD )){
+        if ( value >= ( notificationStatus + THRESHOLD )){
             addNotification("Clicker Frenzy",
                     String.format("Congratulations you're reach %s", String.valueOf(value)));
             notificationStatus = value;
+            textView.setTextColor(Color.parseColor(COLOR_GOLD));
         }
     }
 

@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.templateapp"
+    namespace = "com.example.clickerFrenzy"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.templateapp"
+        applicationId = "com.example.clickerFrenzy"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
