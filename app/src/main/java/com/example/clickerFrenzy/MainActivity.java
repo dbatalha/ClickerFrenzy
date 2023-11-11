@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TEST_CHANNEL = "test-channel";
     private static final int THRESHOLD = 1000;
     private static final String COLOR_GOLD = "#DAA520";
+    private static final String TITLE = "Clicker Frenzy";
+    private static final String CONGRATULATIONS_1000_CLICKS = "Congratulations you're reach %s";
     private long timeEpoch = 0;
     private static final String ERROR_API = "error calling quotes api";
     private String url = "https://type.fit/api/quotes";
@@ -195,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
         int value = Integer.parseInt(textView.getText().toString());
 
         if ( value >= ( notificationStatus + THRESHOLD )){
-            addNotification("Clicker Frenzy",
-                    String.format("Congratulations you're reach %s", String.valueOf(value)));
+            addNotification(TITLE,
+                    String.format(CONGRATULATIONS_1000_CLICKS, String.valueOf(value)));
             notificationStatus = value;
             textView.setTextColor(Color.parseColor(COLOR_GOLD));
         }
