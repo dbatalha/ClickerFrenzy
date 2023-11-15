@@ -38,30 +38,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String CONGRATULATIONS_1000_CLICKS = "Congratulations you're reach %s";
     private long timeEpoch = 0;
     private static final String ERROR_API = "error calling quotes api";
-    private String url = "https://type.fit/api/quotes";
     private int notificationStatus = 0;
+    private MediaPlayer clickSoundEffect;
+    private MediaPlayer longClickSoundEffect;
+    private MediaPlayer warningSoundEffect;
+    PlaySoundEffects playSoundEffects;
     List<Quote> quotes;
 
     public MainActivity() {
 
-    }
-
-    public void playSoundClick() {
-        Log.d("SOUND", "This is the function");
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.click_sound);
-        mediaPlayer.start();
-    }
-
-    public void playSoundLongClick() {
-        Log.d("SOUND", "This is the long click function");
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.click_long);
-        mediaPlayer.start();
-    }
-
-    public void playWarningEffect() {
-        Log.d("SOUND", "Play warning effect");
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.warning_sound);
-        mediaPlayer.start();
     }
 
     private void vibrate(int time) {
@@ -78,14 +63,15 @@ public class MainActivity extends AppCompatActivity {
 
         Quote selectedQuote = quotes.get(randomQuote);
 
-        TextView quoteText = (TextView) findViewById(R.id.quoteText);
-        TextView quoteAuthor = (TextView) findViewById(R.id.quoteAuthor);
+        TextView quoteText = findViewById(R.id.quoteText);
+        TextView quoteAuthor = findViewById(R.id.quoteAuthor);
 
         quoteText.setText(selectedQuote.text);
         quoteAuthor.setText(selectedQuote.author);
     }
 
     private void quotesRequest() {
+        String url = "https://type.fit/api/quotes";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url,
                 new Response.Listener<JSONArray>() {
             @Override
@@ -138,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             long currentTime = System.currentTimeMillis();
             long total = currentTime - timeEpoch;
             if (total >= 30000) {
-                playWarningEffect();
+                playSoundEffects.playSoundEffect(warningSoundEffect);
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 vibrate(50);
                 int currentClicks = ClickActions.decreaseClicks(editText, 1);
@@ -150,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             TimeUnit.SECONDS.sleep(1);
-            Log.d("THREAD", "Time calculation thread %s".format(Long.toString(total)));
+            Log.d("THREAD", String.format(Long.toString(total)));
         }
 
     }
@@ -167,13 +153,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addNotification(String title, String value) {
+    private void addNotification(String value) {
         createNotificationChannel();
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this, TEST_CHANNEL)
                         .setSmallIcon(R.drawable.cookie)
-                        .setContentTitle(title)
+                        .setContentTitle(MainActivity.TITLE)
                         .setContentText(value)
                         .setAutoCancel(true)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
@@ -181,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         Intent notificationIntent = new Intent(this, NotificationView.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        notificationIntent.putExtra(title, value);
+        notificationIntent.putExtra(MainActivity.TITLE, value);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1,
                 notificationIntent,
@@ -197,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         int value = Integer.parseInt(textView.getText().toString());
 
         if ( value >= ( notificationStatus + THRESHOLD )){
-            addNotification(TITLE,
+            addNotification(
                     String.format(CONGRATULATIONS_1000_CLICKS, String.valueOf(value)));
             notificationStatus = value;
             textView.setTextColor(Color.parseColor(COLOR_GOLD));
@@ -208,6 +194,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        playSoundEffects = new PlaySoundEffects();
+
+        clickSoundEffect = MediaPlayer.create(this, R.raw.click_sound);
+        longClickSoundEffect = MediaPlayer.create(this, R.raw.click_long);
+        warningSoundEffect = MediaPlayer.create(this, R.raw.warning_sound);
 
         TextView editText = (TextView) findViewById(R.id.counterTextLabel);
         editText.setText("0");
@@ -235,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 ClickActions.increaseClicks(editText, 1);
                 vibrate(100);
-                playSoundClick();
+                playSoundEffects.playSoundEffect(clickSoundEffect);
                 setRandomQuote();
                 rewards(editText);
             }
@@ -243,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 timeEpoch = System.currentTimeMillis();
-                playSoundLongClick();
+                playSoundEffects.playSoundEffect(longClickSoundEffect);
                 Log.d("BUTTONS", "Button long click teste pressed.");
                 TextView editText = (TextView) findViewById(R.id.counterTextLabel);
                 vibrate(500);
