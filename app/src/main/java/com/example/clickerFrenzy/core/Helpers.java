@@ -1,4 +1,4 @@
-package com.example.clickerFrenzy;
+package com.example.clickerFrenzy.core;
 
 public class Helpers {
 

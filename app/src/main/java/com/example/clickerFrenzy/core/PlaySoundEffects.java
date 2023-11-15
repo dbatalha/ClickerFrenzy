@@ -1,4 +1,4 @@
-package com.example.clickerFrenzy;
+package com.example.clickerFrenzy.core;
 
 import android.media.MediaPlayer;
 import android.util.Log;

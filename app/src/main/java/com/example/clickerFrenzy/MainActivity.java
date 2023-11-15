@@ -22,6 +22,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.clickerFrenzy.core.ClickActions;
+import com.example.clickerFrenzy.core.Helpers;
+import com.example.clickerFrenzy.core.NotificationView;
+import com.example.clickerFrenzy.core.PlaySoundEffects;
+import com.example.clickerFrenzy.core.Quote;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -190,6 +196,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void performActionClick(TextView textView, int clicksCount, int vibrateTime, Click click){
+        timeEpoch = System.currentTimeMillis();
+        Log.d("BUTTONS", "Click action.");
+        ClickActions.increaseClicks(textView, clicksCount);
+        vibrate(vibrateTime);
+
+        switch (click){
+            case LEFT:
+                playSoundEffects.playSoundEffect(clickSoundEffect);
+                break;
+
+            case LEFT_LONG:
+                playSoundEffects.playSoundEffect(longClickSoundEffect);
+                break;
+        }
+
+        setRandomQuote();
+        rewards(textView);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -201,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         longClickSoundEffect = MediaPlayer.create(this, R.raw.click_long);
         warningSoundEffect = MediaPlayer.create(this, R.raw.warning_sound);
 
-        TextView editText = (TextView) findViewById(R.id.counterTextLabel);
+        TextView editText = findViewById(R.id.counterTextLabel);
         editText.setText("0");
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -219,29 +245,17 @@ public class MainActivity extends AppCompatActivity {
         });
         timeThread.start();
 
-        Button button = (Button) findViewById(R.id.teste);
+        Button button = findViewById(R.id.teste);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                timeEpoch = System.currentTimeMillis();
-                Log.d("BUTTONS", "Button teste pressed.");
-                TextView editText = (TextView) findViewById(R.id.counterTextLabel);
-                ClickActions.increaseClicks(editText, 1);
-                vibrate(100);
-                playSoundEffects.playSoundEffect(clickSoundEffect);
-                setRandomQuote();
-                rewards(editText);
+                Click click = Click.LEFT;
+                performActionClick(editText, 1, 100, click);
             }
         });
         button.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
-                timeEpoch = System.currentTimeMillis();
-                playSoundEffects.playSoundEffect(longClickSoundEffect);
-                Log.d("BUTTONS", "Button long click teste pressed.");
-                TextView editText = (TextView) findViewById(R.id.counterTextLabel);
-                vibrate(500);
-                ClickActions.increaseClicks(editText, 15);
-                setRandomQuote();
-                rewards(editText);
+                Click click = Click.LEFT_LONG;
+                performActionClick(editText, 15, 500, click);
                 return true;
             }
         });
