@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String COLOR_GOLD = "#DAA520";
     private static final String TITLE = "Clicker Frenzy";
     private static final String CONGRATULATIONS_1000_CLICKS = "Congratulations you're reach %s";
+    private static final int INCREASE_1 = 1;
+    private static final int INCREASE_15 = 15;
+    private static final int VIBRATE_SHORT = 100;
+    private static final int VIBRATE_LONG = 500;
     private long timeEpoch = 0;
     private static final String ERROR_API = "error calling quotes api";
     private int notificationStatus = 0;
@@ -249,13 +253,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Click click = Click.LEFT;
-                performActionClick(editText, 1, 100, click);
+                performActionClick(editText, INCREASE_1, VIBRATE_SHORT, click);
             }
         });
         button.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 Click click = Click.LEFT_LONG;
-                performActionClick(editText, 15, 500, click);
+                performActionClick(editText, INCREASE_15, VIBRATE_LONG, click);
                 return true;
             }
         });
