@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -27,7 +28,6 @@ import com.example.clickerFrenzy.core.Helpers;
 import com.example.clickerFrenzy.core.NotificationView;
 import com.example.clickerFrenzy.core.PlaySoundEffects;
 import com.example.clickerFrenzy.core.Quote;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int INCREASE_15 = 15;
     private static final int VIBRATE_SHORT = 100;
     private static final int VIBRATE_LONG = 500;
+    private static final String NO_QUOTES_TOAST = "No quotes available to display.";
     private long timeEpoch = 0;
     private static final String ERROR_API = "error calling quotes api";
     private int notificationStatus = 0;
@@ -220,6 +221,16 @@ public class MainActivity extends AppCompatActivity {
         rewards(textView);
     }
 
+    private boolean checkQuoteStatus(){
+
+        if (quotes == null){
+            Toast.makeText(getApplicationContext(), NO_QUOTES_TOAST, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -253,13 +264,17 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Click click = Click.LEFT;
-                performActionClick(editText, INCREASE_1, VIBRATE_SHORT, click);
+                if (checkQuoteStatus()){
+                    performActionClick(editText, INCREASE_1, VIBRATE_SHORT, click);
+                }
             }
         });
         button.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View v) {
                 Click click = Click.LEFT_LONG;
-                performActionClick(editText, INCREASE_15, VIBRATE_LONG, click);
+                if (checkQuoteStatus()){
+                    performActionClick(editText, INCREASE_15, VIBRATE_LONG, click);
+                }
                 return true;
             }
         });
